@@ -21,9 +21,8 @@ package com.mongodb.hadoop;
 import com.mongodb.*;
 import com.mongodb.hadoop.util.*;
 import org.apache.commons.logging.*;
-import org.apache.hadoop.conf.*;
 import org.apache.hadoop.io.*;
-import org.apache.hadoop.mapreduce.*;
+import org.apache.hadoop.mapred.*;
 
 import java.io.*;
 
@@ -31,7 +30,7 @@ import java.io.*;
 // Commons
 
 /**
- * Configuration helper tool for MongoDB related Map/Reduce jobs Instance based, more idiomatic for those who prefer it
+ * JobConf helper tool for MongoDB related Map/Reduce jobs Instance based, more idiomatic for those who prefer it
  * to the static methoding of ConfigUtil
  */
 public class MongoConfig {
@@ -41,15 +40,15 @@ public class MongoConfig {
      */
     @Deprecated
     public MongoConfig(){
-        _conf = new Configuration();
+        _conf = new JobConf();
     }
 
-    public MongoConfig( Configuration conf ){
+    public MongoConfig(JobConf conf ){
         _conf = conf;
     }
 
     public MongoConfig( DataInput in ) throws IOException{
-        _conf = new Configuration();
+        _conf = new JobConf();
         _conf.readFields( in );
     }
 
@@ -310,7 +309,7 @@ public class MongoConfig {
     public void setReadSplitsFromSecondary( boolean value ) {
         MongoConfigUtil.setReadSplitsFromSecondary( _conf, value );
     }
-    
+
     /**
      * If CREATE_INPUT_SPLITS is true but SPLITS_USE_CHUNKS is false, Mongo-Hadoop will attempt
      * to create custom input splits for you.  By default it will split on {@code _id}, which is a
@@ -356,7 +355,7 @@ public class MongoConfig {
     public void setInputSplitKey( DBObject key ) {
         MongoConfigUtil.setInputSplitKey( _conf, key );
     }
-            
+
     /**
      * If {@code true}, the driver will attempt to split the MongoDB Input data (if reading from Mongo) into
      * multiple InputSplits to allow parallelism/concurrency in processing within Hadoop.  That is to say,
@@ -402,16 +401,16 @@ public class MongoConfig {
     public void setInputKey( String fieldName ) {
         MongoConfigUtil.setInputKey( _conf, fieldName );
     }
-    
+
     public boolean isNoTimeout() {
         return MongoConfigUtil.isNoTimeout( _conf );
     }
-    
+
     public void setNoTimeout( boolean value ) {
         MongoConfigUtil.setNoTimeout( _conf, value );
     }
 
-    final Configuration _conf;
+    final JobConf _conf;
 
     private static final Log LOG = LogFactory.getLog( MongoConfig.class );
 }

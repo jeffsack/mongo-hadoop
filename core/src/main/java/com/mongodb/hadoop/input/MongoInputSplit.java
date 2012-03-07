@@ -21,13 +21,13 @@ import com.mongodb.*;
 import com.mongodb.hadoop.util.*;
 import org.apache.commons.logging.*;
 import org.apache.hadoop.io.*;
-import org.apache.hadoop.mapreduce.*;
+import org.apache.hadoop.mapred.InputSplit;
 import org.bson.*;
 
 import java.io.*;
 import java.util.*;
 
-public class MongoInputSplit extends InputSplit implements Writable {
+public class MongoInputSplit implements InputSplit, Writable {
 
     public MongoInputSplit( MongoURI inputURI,
                             String keyField,
@@ -82,7 +82,7 @@ public class MongoInputSplit extends InputSplit implements Writable {
                                                add( "uri", _mongoURI.toString() ).
                                                add( "key", _keyField ).
                                                add( "query", _querySpec ).
-                                               add( "field", _fieldSpec ).                                              
+                                               add( "field", _fieldSpec ).
                                                add( "sort", _sortSpec ).
                                                add( "limit", _limit ).
                                                add( "skip", _skip ).
@@ -115,8 +115,8 @@ public class MongoInputSplit extends InputSplit implements Writable {
             // TODO - Figure out how to gracefully mark this as an empty
             log.info( "No Length Header available." + e );
             spec = new BasicDBObject();
-        }         
-        
+        }
+
         _mongoURI = new MongoURI((String) spec.get( "uri" ));
         _keyField = (String) spec.get( "key" );
         _querySpec = new BasicDBObject( ((BSONObject) spec.get( "query" )).toMap() );
@@ -147,11 +147,11 @@ public class MongoInputSplit extends InputSplit implements Writable {
     }
 
     BSONEncoder getBSONEncoder(){
-        if (_bsonEncoder == null) 
+        if (_bsonEncoder == null)
             _bsonEncoder = new BasicBSONEncoder();
         return _bsonEncoder;
     }
-    
+
     BSONDecoder getBSONDecoder(){
         if (_bsonDecoder == null)
             _bsonDecoder = new BasicBSONDecoder();

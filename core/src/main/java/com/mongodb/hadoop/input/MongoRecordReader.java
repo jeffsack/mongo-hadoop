@@ -19,14 +19,17 @@ package com.mongodb.hadoop.input;
 // Mongo
 
 import com.mongodb.*;
+import com.mongodb.hadoop.ObjectHolder;
 import org.apache.commons.logging.*;
-import org.apache.hadoop.mapreduce.*;
+import org.apache.hadoop.mapred.RecordReader;
 import org.bson.*;
+
+import java.io.IOException;
 
 // Hadoop
 // Commons
 
-public class MongoRecordReader extends RecordReader<Object, BSONObject> {
+public class MongoRecordReader implements RecordReader<ObjectHolder<Object>, BSONObject> {
 
     public MongoRecordReader( MongoInputSplit split ){
         _split = split;
@@ -34,19 +37,45 @@ public class MongoRecordReader extends RecordReader<Object, BSONObject> {
     }
 
     @Override
-    public void close(){
-        if ( _cursor != null )
+    public boolean next(ObjectHolder<Object> o, BSONObject bsonObject) throws IOException {
+
+        try {
+            if (!_cursor.hasNext())
+                return false;
+
+            _current = _cursor.next();
+            _seen++;
+
+            o.object = _current.get(_split.getKeyField());
+            bsonObject.putAll(_current);
+
+            return true;
+        } catch (MongoException e) {
+            return false;
+        }
+
+
+    }
+
+    @Override
+    public ObjectHolder<Object> createKey() {
+        return new ObjectHolder<Object>();
+    }
+
+    @Override
+    public BSONObject createValue() {
+        return new BasicDBObject();
+    }
+
+    @Override
+    public long getPos() throws IOException {
+        return _seen;
+    }
+
+    @Override
+    public void close() {
+        if (_cursor != null)
             _cursor.close();
-    }
-
-    @Override
-    public Object getCurrentKey(){
-        return _current.get( _split.getKeyField() );
-    }
-
-    @Override
-    public BSONObject getCurrentValue(){
-        return _current;
     }
 
     public float getProgress(){
@@ -63,34 +92,11 @@ public class MongoRecordReader extends RecordReader<Object, BSONObject> {
         }
     }
 
-    @Override
-    public void initialize( InputSplit split, TaskAttemptContext context ){
-        _total = 1.0f;
-    }
-
-    @Override
-    public boolean nextKeyValue(){
-        try {
-            if ( !_cursor.hasNext() )
-                return false;
-
-            _current = _cursor.next();
-            _seen++;
-
-            return true;
-        }
-        catch ( MongoException e ) {
-            return false;
-        }
-    }
-
-
     private BSONObject _current;
     private final MongoInputSplit _split;
     private final DBCursor _cursor;
-    private float _seen = 0;
-    private float _total;
+    private long _seen = 0;
 
-    private static final Log LOG = LogFactory.getLog( MongoRecordReader.class );
+    private static final Log LOG = LogFactory.getLog(MongoRecordReader.class);
 
 }

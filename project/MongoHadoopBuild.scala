@@ -7,7 +7,7 @@ import AssemblyKeys._
 object MongoHadoopBuild extends Build {
 
   lazy val buildSettings = Seq(
-    version := "1.0.0-rc1-SNAPSHOT",
+    version := "1.0.0-cascading-rc1-SNAPSHOT",
     crossScalaVersions := Nil,
     crossPaths := false,
     organization := "org.mongodb"
@@ -41,24 +41,24 @@ object MongoHadoopBuild extends Build {
 
   lazy val root = Project( id = "mongo-hadoop", 
                           base = file("."),
-                          settings = dependentSettings ) aggregate(core, flume, pig)
+                          settings = dependentSettings ) aggregate(core ) //, flume, pig)
 
   lazy val core = Project( id = "mongo-hadoop-core", 
                            base = file("core"), 
                            settings = coreSettings )
 
 
-  lazy val pig = Project( id = "mongo-hadoop-pig",
-                          base = file("pig"),
-                          settings = pigSettings ) dependsOn( core )
+//  lazy val pig = Project( id = "mongo-hadoop-pig",
+//                          base = file("pig"),
+//                          settings = pigSettings ) dependsOn( core )
 
-  lazy val streaming = Project( id = "mongo-hadoop-streaming", 
-                                base = file("streaming"), 
-                                settings = streamingSettings ) dependsOn( core )
+//  lazy val streaming = Project( id = "mongo-hadoop-streaming",
+//                                base = file("streaming"),
+//                                settings = streamingSettings ) dependsOn( core )
 
-  lazy val flume = Project( id = "mongo-flume",
-                            base = file("flume"),
-                            settings = flumeSettings ) 
+//  lazy val flume = Project( id = "mongo-flume",
+//                            base = file("flume"),
+//                            settings = flumeSettings )
 
 
 
@@ -104,47 +104,47 @@ object MongoHadoopBuild extends Build {
     publishArtifact := false
   )
 
-  lazy val flumeSettings = baseSettings ++ Seq(
-    libraryDependencies ++= Seq(Dependencies.mongoJavaDriver, Dependencies.flume)
-  )
+//  lazy val flumeSettings = baseSettings ++ Seq(
+//    libraryDependencies ++= Seq(Dependencies.mongoJavaDriver, Dependencies.flume)
+//  )
 
-  lazy val streamingSettings = dependentSettings ++ assemblySettings ++ Seq( 
-    mainClass in assembly := Some("com.mongodb.hadoop.streaming.MongoStreamJob"),
-    excludedJars in assembly <<= (fullClasspath in assembly) map ( cp => 
-      cp filterNot { x =>
-        x.data.getName.startsWith("hadoop-streaming") || x.data.getName.startsWith("mongo-java-driver") /*||
-        x.data.getName.startsWith("mongo-hadoop-core") */
-      }
-    ),
-    libraryDependencies <++= (scalaVersion, libraryDependencies, hadoopRelease) { (sv, deps, hr: String) => 
+//  lazy val streamingSettings = dependentSettings ++ assemblySettings ++ Seq(
+//    mainClass in assembly := Some("com.mongodb.hadoop.streaming.MongoStreamJob"),
+//    excludedJars in assembly <<= (fullClasspath in assembly) map ( cp =>
+//      cp filterNot { x =>
+//        x.data.getName.startsWith("hadoop-streaming") || x.data.getName.startsWith("mongo-java-driver") /*||
+//        x.data.getName.startsWith("mongo-hadoop-core") */
+//      }
+//    ),
+//    libraryDependencies <++= (scalaVersion, libraryDependencies, hadoopRelease) { (sv, deps, hr: String) =>
+//
+//    val streamingDeps = coreHadoopMap.getOrElse(hr, sys.error("Hadoop Release '%s' is an invalid/unsupported release. Valid entries are in %s".format(hr, coreHadoopMap.keySet)))
+//      streamingDeps._1.getOrElse(() => Seq.empty[ModuleID])()
+//    },
+//    skip in Compile <<= hadoopRelease.map(hr => {
+//      val skip = !coreHadoopMap.getOrElse(hr,
+//                    sys.error("Hadoop Release '%s' is an invalid/unsupported release. " +
+//                              " Valid entries are in %s".format(hr, coreHadoopMap.keySet))
+//                    )._1.isDefined
+//      if (skip) System.err.println("*** Will not compile Hadoop Streaming, which is unsupported in this build of Hadoop")
+//
+//      skip
+//    }),
+//    publishArtifact <<= (hadoopRelease) (hr => {
+//      !coreHadoopMap.getOrElse(hr, sys.error("Hadoop Release '%s' is an invalid/unsupported release. " +
+//                              " Valid entries are in %s".format(hr, coreHadoopMap.keySet)))._1.isDefined
+//    })
+//
+//  )
 
-    val streamingDeps = coreHadoopMap.getOrElse(hr, sys.error("Hadoop Release '%s' is an invalid/unsupported release. Valid entries are in %s".format(hr, coreHadoopMap.keySet)))
-      streamingDeps._1.getOrElse(() => Seq.empty[ModuleID])()
-    },
-    skip in Compile <<= hadoopRelease.map(hr => {
-      val skip = !coreHadoopMap.getOrElse(hr, 
-                    sys.error("Hadoop Release '%s' is an invalid/unsupported release. " +
-                              " Valid entries are in %s".format(hr, coreHadoopMap.keySet))
-                    )._1.isDefined
-      if (skip) System.err.println("*** Will not compile Hadoop Streaming, which is unsupported in this build of Hadoop")
-
-      skip
-    }),
-    publishArtifact <<= (hadoopRelease) (hr => {
-      !coreHadoopMap.getOrElse(hr, sys.error("Hadoop Release '%s' is an invalid/unsupported release. " +
-                              " Valid entries are in %s".format(hr, coreHadoopMap.keySet)))._1.isDefined
-    })
-
-  ) 
-
-  val pigSettings = dependentSettings ++ Seq( 
-    resolvers ++= Seq(Resolvers.hypobytes), /** Seems to have thrift deps I need*/
-    libraryDependencies <++= (scalaVersion, libraryDependencies, hadoopRelease) { (sv, deps, hr: String) => 
-
-      val hadoopDeps = coreHadoopMap.getOrElse(hr, sys.error("Hadoop Release '%s' is an invalid/unsupported release. Valid entries are in %s".format(hr, coreHadoopMap.keySet)))
-      hadoopDeps._4()
-    }
-  )
+//  val pigSettings = dependentSettings ++ Seq(
+//    resolvers ++= Seq(Resolvers.hypobytes), /** Seems to have thrift deps I need*/
+//    libraryDependencies <++= (scalaVersion, libraryDependencies, hadoopRelease) { (sv, deps, hr: String) =>
+//
+//      val hadoopDeps = coreHadoopMap.getOrElse(hr, sys.error("Hadoop Release '%s' is an invalid/unsupported release. Valid entries are in %s".format(hr, coreHadoopMap.keySet)))
+//      hadoopDeps._4()
+//    }
+//  )
 
   val coreSettings = dependentSettings ++ Seq( 
     libraryDependencies ++= Seq(Dependencies.mongoJavaDriver, Dependencies.junit),
@@ -216,7 +216,7 @@ object Resolvers {
 object Dependencies {
   val mongoJavaDriver = "org.mongodb" % "mongo-java-driver" % "2.7.3"
   val junit = "junit" % "junit" % "4.10" % "test"
-  val flume = "com.cloudera" % "flume-core" % "0.9.4-cdh3u3"
+//  val flume = "com.cloudera" % "flume-core" % "0.9.4-cdh3u3"
 }
 
 // vim: set ts=2 sw=2 sts=2 et:

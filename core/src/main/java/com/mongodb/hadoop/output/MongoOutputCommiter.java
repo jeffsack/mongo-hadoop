@@ -16,7 +16,7 @@
 
 package com.mongodb.hadoop.output;
 
-import org.apache.hadoop.mapreduce.*;
+import org.apache.hadoop.mapred.*;
 
 public class MongoOutputCommiter extends OutputCommitter {
 

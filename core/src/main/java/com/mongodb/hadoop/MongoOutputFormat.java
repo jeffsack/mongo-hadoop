@@ -21,24 +21,27 @@ package com.mongodb.hadoop;
 import com.mongodb.hadoop.output.*;
 import com.mongodb.hadoop.util.*;
 import org.apache.commons.logging.*;
-import org.apache.hadoop.mapreduce.*;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.mapred.*;
+import org.apache.hadoop.util.Progressable;
+
+import java.io.IOException;
 
 // Commons
 // Hadoop
 
-public class MongoOutputFormat<K, V> extends OutputFormat<K, V> {
+public class MongoOutputFormat<K, V> implements OutputFormat<K, V> {
 
-    public void checkOutputSpecs( final JobContext context ){ }
-
-    public OutputCommitter getOutputCommitter( final TaskAttemptContext context ){
-        return new MongoOutputCommiter();
+    @Override
+    public void checkOutputSpecs(FileSystem fileSystem, JobConf entries) throws IOException {
     }
 
     /**
      * Get the record writer that points to the output collection.
      */
-    public RecordWriter<K, V> getRecordWriter( final TaskAttemptContext context ){
-        return new MongoRecordWriter( MongoConfigUtil.getOutputCollection( context.getConfiguration() ), context );
+    @Override
+    public RecordWriter<K, V> getRecordWriter(FileSystem fileSystem, JobConf conf, String s, Progressable progressable) throws IOException {
+        return new MongoRecordWriter(MongoConfigUtil.getOutputCollection(conf));
     }
 
     public MongoOutputFormat(){ }

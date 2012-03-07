@@ -19,19 +19,19 @@ package com.mongodb.hadoop.output;
 import com.mongodb.*;
 import com.mongodb.hadoop.*;
 import org.apache.hadoop.io.*;
-import org.apache.hadoop.mapreduce.*;
+import org.apache.hadoop.mapred.*;
 import org.bson.*;
 
 import java.io.*;
 
-public class MongoRecordWriter<K, V> extends RecordWriter<K, V> {
+public class MongoRecordWriter<K, V> implements RecordWriter<K, V> {
 
-    public MongoRecordWriter( DBCollection c, TaskAttemptContext ctx ){
+    public MongoRecordWriter( DBCollection c ){
         _collection = c;
-        _context = ctx;
     }
 
-    public void close( TaskAttemptContext context ){
+    @Override
+    public void close(Reporter reporter) throws IOException {
         _collection.getDB().getLastError();
     }
 
@@ -102,11 +102,7 @@ public class MongoRecordWriter<K, V> extends RecordWriter<K, V> {
         }
     }
 
-    public TaskAttemptContext getContext(){
-        return _context;
-    }
-
     final DBCollection _collection;
-    final TaskAttemptContext _context;
+
 }
 

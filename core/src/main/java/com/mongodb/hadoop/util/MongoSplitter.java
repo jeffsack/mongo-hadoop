@@ -4,7 +4,7 @@ import com.mongodb.*;
 import com.mongodb.hadoop.*;
 import com.mongodb.hadoop.input.*;
 import org.apache.commons.logging.*;
-import org.apache.hadoop.mapreduce.*;
+import org.apache.hadoop.mapred.InputSplit;
 
 import java.net.UnknownHostException;
 import java.util.*;
@@ -23,6 +23,11 @@ import java.util.*;
  */
 
 public class MongoSplitter {
+
+    public static InputSplit[] calculateSplitsArray(MongoConfig conf) {
+        List<InputSplit> inputSplits = calculateSplits(conf);
+        return inputSplits.toArray(new InputSplit[inputSplits.size()]);
+    }
 
     public static List<InputSplit> calculateSplits( MongoConfig conf ){
 
@@ -50,7 +55,7 @@ public class MongoSplitter {
         DB db = mongo.getDB( uri.getDatabase() );
         DBCollection coll = db.getCollection( uri.getCollection() );
         final CommandResult stats = coll.getStats();
-        
+
         final boolean isSharded = stats.getBoolean( "sharded", false );
 
         //connecting to the individual backend mongods is not safe, do not do so by default
@@ -74,7 +79,7 @@ public class MongoSplitter {
                 log.info( "Using Unsharded Split mode (Calculating multiple splits though)" );
                 return calculateUnshardedSplits( conf, slaveOk, uri, coll );
             }
-            
+
         }
         else {
             log.info( "Creation of Input Splits is disabled; Non-Split mode calculation entering." );
@@ -82,21 +87,21 @@ public class MongoSplitter {
         }
     }
 
-    private static List<InputSplit> calculateUnshardedSplits( MongoConfig conf, boolean slaveOk, 
+    private static List<InputSplit> calculateUnshardedSplits( MongoConfig conf, boolean slaveOk,
                                                               MongoURI uri, DBCollection coll ){
         final List<InputSplit> splits = new ArrayList<InputSplit>();
         final DBObject splitKey = conf.getInputSplitKey(); // a bit slower but forces validation of the JSON
         final int splitSize = conf.getSplitSize(); // in MB
         final String ns = coll.getFullName();
         final DBObject q = conf.getQuery();
-        
+
         log.info( "Calculating unsharded input splits on namespace '" + ns + "' with Split Key '" + splitKey.toString() + "' and a split size of '" + splitSize + "'mb per" );
 
         final DBObject cmd = BasicDBObjectBuilder.start("splitVector", ns).
                                           add( "keyPattern", splitKey ).
                                           add( "force", false ). // force:True is misbehaving it seems
                                           add( "maxChunkSize", splitSize ).get();
-        
+
         log.trace( "Issuing Command: " + cmd );
         CommandResult data = coll.getDB().command( cmd );
 
@@ -104,10 +109,10 @@ public class MongoSplitter {
             throw new IllegalArgumentException( "Error calculating splits: " + data );
         else if ( (Double) data.get( "ok" ) != 1.0 )
             throw new IllegalArgumentException( "Unable to calculate input splits: " + ( (String) data.get( "errmsg" ) ) );
-        
+
         // Comes in a format where "min" and "max" are implicit and each entry is just a boundary key; not ranged
         BasicDBList splitData = (BasicDBList) data.get( "splitKeys" );
-        
+
         if (splitData.size() <= 1) {
             if (splitData.size() < 1)
                 log.warn( "WARNING: No Input Splits were calculated by the split code. "
@@ -139,21 +144,21 @@ public class MongoSplitter {
         BasicDBObjectBuilder b = BasicDBObjectBuilder.start( "$query", q );
         if (min != null) // min ceiling
            b.add( "$min", min );
-        
+
         if (max != null) // max ceiling
             b.add( "$max", max );
 
         final DBObject query = b.get();
         log.trace( "Assembled Query: " + query );
 
-        return new MongoInputSplit( conf.getInputURI(), conf.getInputKey(), query, conf.getFields(), 
+        return new MongoInputSplit( conf.getInputURI(), conf.getInputKey(), query, conf.getFields(),
                                     conf.getSort(), conf.getLimit(), conf.getSkip(), conf.isNoTimeout() );
     }
-    
+
     private static List<InputSplit> calculateSingleSplit( MongoConfig conf ){
         final List<InputSplit> splits = new ArrayList<InputSplit>( 1 );
         // no splits, no sharding
-        splits.add( new MongoInputSplit( conf.getInputURI(), conf.getInputKey(), conf.getQuery(), 
+        splits.add( new MongoInputSplit( conf.getInputURI(), conf.getInputKey(), conf.getQuery(),
                                          conf.getFields(), conf.getSort(), conf.getLimit(), conf.getSkip(),
                                          conf.isNoTimeout() ) );
 
@@ -232,7 +237,7 @@ public class MongoSplitter {
         for ( String host : shardSet ){
             MongoURI thisUri = getNewURI( uri, host, slaveOk );
             splits.add( new MongoInputSplit( thisUri, conf.getInputKey(), conf.getQuery(), conf.getFields(),
-                                             conf.getSort(), conf.getLimit(), conf.getSkip(), 
+                                             conf.getSort(), conf.getLimit(), conf.getSkip(),
                                              conf.isNoTimeout() ) ); // TODO - Should the input Key be the shard key?
         }
         return splits;
@@ -346,7 +351,7 @@ public class MongoSplitter {
                 }
                 splits.add(
                         new MongoInputSplit( inputURI, conf.getInputKey(), shardKeyQuery, conf.getFields(), conf.getSort(),  // TODO - should inputKey be the shard key?
-                                             conf.getLimit(), conf.getSkip(), 
+                                             conf.getLimit(), conf.getSkip(),
                                              conf.isNoTimeout() ) );
             }
 

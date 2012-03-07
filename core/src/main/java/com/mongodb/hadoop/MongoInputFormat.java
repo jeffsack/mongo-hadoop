@@ -22,39 +22,32 @@ import com.mongodb.*;
 import com.mongodb.hadoop.input.*;
 import com.mongodb.hadoop.util.*;
 import org.apache.commons.logging.*;
-import org.apache.hadoop.conf.*;
-import org.apache.hadoop.mapreduce.*;
+import org.apache.hadoop.mapred.*;
 import org.bson.*;
 
-import java.util.*;
+import java.io.IOException;
 
 // Commons
 // Hadoop
 // Java
 
-public class MongoInputFormat extends InputFormat<Object, BSONObject> {
+public class MongoInputFormat implements InputFormat<ObjectHolder<Object>, BSONObject> {
 
     @Override
-    public RecordReader<Object, BSONObject> createRecordReader( InputSplit split, TaskAttemptContext context ){
-        if ( !( split instanceof MongoInputSplit ) )
-            throw new IllegalStateException( "Creation of a new RecordReader requires a MongoInputSplit instance." );
+    public InputSplit[] getSplits(JobConf hadoopConfiguration, int i) throws IOException {
+        final MongoConfig conf = new MongoConfig(hadoopConfiguration);
+        return MongoSplitter.calculateSplitsArray(conf);
+    }
+
+    @Override
+    public RecordReader<ObjectHolder<Object>, BSONObject> getRecordReader(InputSplit split, JobConf entries, Reporter reporter) throws IOException {
+        if (!(split instanceof MongoInputSplit))
+            throw new IllegalStateException("Creation of a new RecordReader requires a MongoInputSplit instance.");
 
         final MongoInputSplit mis = (MongoInputSplit) split;
 
-        return new com.mongodb.hadoop.input.MongoRecordReader( mis );
+        return new com.mongodb.hadoop.input.MongoRecordReader(mis);
     }
 
-    @Override
-    public List<InputSplit> getSplits( JobContext context ){
-        final Configuration hadoopConfiguration = context.getConfiguration();
-        final MongoConfig conf = new MongoConfig( hadoopConfiguration );
-        return MongoSplitter.calculateSplits( conf );
-    }
-
-
-    public boolean verifyConfiguration( Configuration conf ){
-        return true;
-    }
-
-    private static final Log LOG = LogFactory.getLog( MongoInputFormat.class );
+    private static final Log LOG = LogFactory.getLog(MongoInputFormat.class);
 }

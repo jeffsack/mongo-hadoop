@@ -20,12 +20,11 @@ package com.mongodb.hadoop.util;
 import com.mongodb.*;
 import com.mongodb.util.*;
 import org.apache.commons.logging.*;
-import org.apache.hadoop.conf.*;
 import org.apache.hadoop.io.*;
-import org.apache.hadoop.mapreduce.*;
+import org.apache.hadoop.mapred.*;
 
 /**
- * Configuration helper tool for MongoDB related Map/Reduce jobs
+ * JobConf helper tool for MongoDB related Map/Reduce jobs
  */
 
 public class MongoConfigUtil {
@@ -105,7 +104,7 @@ public class MongoConfigUtil {
      * If {@code true}, the driver will attempt to split the MongoDB Input data (if reading from Mongo) into
      * multiple InputSplits to allow parallelism/concurrency in processing within Hadoop.  That is to say,
      * Hadoop will assign one InputSplit per mapper.
-     * 
+     *
      * This is {@code true} by default now, but if {@code false}, only one InputSplit (your whole collection) will be
      * assigned to Hadoop – severely reducing parallel mapping.
      */
@@ -132,117 +131,117 @@ public class MongoConfigUtil {
      */
     public static final String SPLITS_SLAVE_OK = "mongo.input.split.allow_read_from_secondaries";
 
-    public static boolean isJobVerbose( Configuration conf ){
+    public static boolean isJobVerbose(JobConf conf ){
         return conf.getBoolean( JOB_VERBOSE, false );
     }
 
-    public static void setJobVerbose( Configuration conf, boolean val ){
+    public static void setJobVerbose(JobConf conf, boolean val ){
         conf.setBoolean( JOB_VERBOSE, val );
     }
 
-    public static boolean isJobBackground( Configuration conf ){
+    public static boolean isJobBackground(JobConf conf ){
         return conf.getBoolean( JOB_BACKGROUND, false );
     }
 
-    public static void setJobBackground( Configuration conf, boolean val ){
+    public static void setJobBackground(JobConf conf, boolean val ){
         conf.setBoolean( JOB_BACKGROUND, val );
     }
 
     // TODO - In light of key/value specifics should we have a base MongoMapper
     // class?
-    public static Class<? extends Mapper> getMapper( Configuration conf ){
+    public static Class<? extends Mapper> getMapper(JobConf conf ){
         /** TODO - Support multiple inputs via getClasses ? **/
         return conf.getClass( JOB_MAPPER, null, Mapper.class );
     }
 
-    public static void setMapper( Configuration conf, Class<? extends Mapper> val ){
+    public static void setMapper(JobConf conf, Class<? extends Mapper> val ){
         conf.setClass( JOB_MAPPER, val, Mapper.class );
     }
 
-    public static Class<?> getMapperOutputKey( Configuration conf ){
+    public static Class<?> getMapperOutputKey(JobConf conf ){
         return conf.getClass( JOB_MAPPER_OUTPUT_KEY, null );
     }
 
-    public static void setMapperOutputKey( Configuration conf, Class<?> val ){
+    public static void setMapperOutputKey(JobConf conf, Class<?> val ){
         conf.setClass( JOB_MAPPER_OUTPUT_KEY, val, Object.class );
     }
 
-    public static Class<?> getMapperOutputValue( Configuration conf ){
+    public static Class<?> getMapperOutputValue(JobConf conf ){
         return conf.getClass( JOB_MAPPER_OUTPUT_VALUE, null );
     }
 
-    public static void setMapperOutputValue( Configuration conf, Class<?> val ){
+    public static void setMapperOutputValue(JobConf conf, Class<?> val ){
         conf.setClass( JOB_MAPPER_OUTPUT_VALUE, val, Object.class );
     }
 
-    public static Class<? extends Reducer> getCombiner( Configuration conf ){
+    public static Class<? extends Reducer> getCombiner(JobConf conf ){
         return conf.getClass( JOB_COMBINER, null, Reducer.class );
     }
 
-    public static void setCombiner( Configuration conf, Class<? extends Reducer> val ){
+    public static void setCombiner(JobConf conf, Class<? extends Reducer> val ){
         conf.setClass( JOB_COMBINER, val, Reducer.class );
     }
 
     // TODO - In light of key/value specifics should we have a base MongoReducer
     // class?
-    public static Class<? extends Reducer> getReducer( Configuration conf ){
+    public static Class<? extends Reducer> getReducer(JobConf conf ){
         /** TODO - Support multiple outputs via getClasses ? **/
         return conf.getClass( JOB_REDUCER, null, Reducer.class );
     }
 
-    public static void setReducer( Configuration conf, Class<? extends Reducer> val ){
+    public static void setReducer(JobConf conf, Class<? extends Reducer> val ){
         conf.setClass( JOB_REDUCER, val, Reducer.class );
     }
 
-    public static Class<? extends Partitioner> getPartitioner( Configuration conf ){
+    public static Class<? extends Partitioner> getPartitioner(JobConf conf ){
         return conf.getClass( JOB_PARTITIONER, null, Partitioner.class );
     }
 
-    public static void setPartitioner( Configuration conf, Class<? extends Partitioner> val ){
+    public static void setPartitioner(JobConf conf, Class<? extends Partitioner> val ){
         conf.setClass( JOB_PARTITIONER, val, Partitioner.class );
     }
 
-    public static Class<? extends RawComparator> getSortComparator( Configuration conf ){
+    public static Class<? extends RawComparator> getSortComparator(JobConf conf ){
         return conf.getClass( JOB_SORT_COMPARATOR, null, RawComparator.class );
     }
 
-    public static void setSortComparator( Configuration conf, Class<? extends RawComparator> val ){
+    public static void setSortComparator(JobConf conf, Class<? extends RawComparator> val ){
         conf.setClass( JOB_SORT_COMPARATOR, val, RawComparator.class );
     }
 
-    public static Class<? extends OutputFormat> getOutputFormat( Configuration conf ){
+    public static Class<? extends OutputFormat> getOutputFormat(JobConf conf ){
         return conf.getClass( JOB_OUTPUT_FORMAT, null, OutputFormat.class );
     }
 
-    public static void setOutputFormat( Configuration conf, Class<? extends OutputFormat> val ){
+    public static void setOutputFormat(JobConf conf, Class<? extends OutputFormat> val ){
         conf.setClass( JOB_OUTPUT_FORMAT, val, OutputFormat.class );
     }
 
-    public static Class<?> getOutputKey( Configuration conf ){
+    public static Class<?> getOutputKey(JobConf conf ){
         return conf.getClass( JOB_OUTPUT_KEY, null );
     }
 
-    public static void setOutputKey( Configuration conf, Class<?> val ){
+    public static void setOutputKey(JobConf conf, Class<?> val ){
         conf.setClass( JOB_OUTPUT_KEY, val, Object.class );
     }
 
-    public static Class<?> getOutputValue( Configuration conf ){
+    public static Class<?> getOutputValue(JobConf conf ){
         return conf.getClass( JOB_OUTPUT_VALUE, null );
     }
 
-    public static void setOutputValue( Configuration conf, Class<?> val ){
+    public static void setOutputValue(JobConf conf, Class<?> val ){
         conf.setClass( JOB_OUTPUT_VALUE, val, Object.class );
     }
 
-    public static Class<? extends InputFormat> getInputFormat( Configuration conf ){
+    public static Class<? extends InputFormat> getInputFormat(JobConf conf ){
         return conf.getClass( JOB_INPUT_FORMAT, null, InputFormat.class );
     }
 
-    public static void setInputFormat( Configuration conf, Class<? extends InputFormat> val ){
+    public static void setInputFormat(JobConf conf, Class<? extends InputFormat> val ){
         conf.setClass( JOB_INPUT_FORMAT, val, InputFormat.class );
     }
 
-    public static MongoURI getMongoURI( Configuration conf, String key ){
+    public static MongoURI getMongoURI(JobConf conf, String key ){
         final String raw = conf.get( key );
         if ( raw != null && !raw.trim().isEmpty() )
             return new MongoURI( raw );
@@ -250,7 +249,7 @@ public class MongoConfigUtil {
             return null;
     }
 
-    public static MongoURI getInputURI( Configuration conf ){
+    public static MongoURI getInputURI(JobConf conf ){
         return getMongoURI( conf, INPUT_URI );
     }
 
@@ -276,7 +275,7 @@ public class MongoConfigUtil {
         }
     }
 
-    public static DBCollection getOutputCollection( Configuration conf ){
+    public static DBCollection getOutputCollection(JobConf conf ){
         try {
             final MongoURI _uri = getOutputURI( conf );
             return getCollection( _uri );
@@ -286,7 +285,7 @@ public class MongoConfigUtil {
         }
     }
 
-    public static DBCollection getInputCollection( Configuration conf ){
+    public static DBCollection getInputCollection(JobConf conf ){
         try {
             final MongoURI _uri = getInputURI( conf );
             return getCollection( _uri );
@@ -297,12 +296,12 @@ public class MongoConfigUtil {
         }
     }
 
-    public static void setMongoURI( Configuration conf, String key, MongoURI value ){
+    public static void setMongoURI(JobConf conf, String key, MongoURI value ){
         conf.set( key, value.toString() ); // todo - verify you can toString a
         // URI object
     }
 
-    public static void setMongoURIString( Configuration conf, String key, String value ){
+    public static void setMongoURIString(JobConf conf, String key, String value ){
 
         try {
             final MongoURI uri = new MongoURI( value );
@@ -313,30 +312,30 @@ public class MongoConfigUtil {
         }
     }
 
-    public static void setInputURI( Configuration conf, String uri ){
+    public static void setInputURI(JobConf conf, String uri ){
         setMongoURIString( conf, INPUT_URI, uri );
     }
 
-    public static void setInputURI( Configuration conf, MongoURI uri ){
+    public static void setInputURI(JobConf conf, MongoURI uri ){
         setMongoURI( conf, INPUT_URI, uri );
     }
 
-    public static MongoURI getOutputURI( Configuration conf ){
+    public static MongoURI getOutputURI(JobConf conf ){
         return getMongoURI( conf, OUTPUT_URI );
     }
 
-    public static void setOutputURI( Configuration conf, String uri ){
+    public static void setOutputURI(JobConf conf, String uri ){
         setMongoURIString( conf, OUTPUT_URI, uri );
     }
 
-    public static void setOutputURI( Configuration conf, MongoURI uri ){
+    public static void setOutputURI(JobConf conf, MongoURI uri ){
         setMongoURI( conf, OUTPUT_URI, uri );
     }
 
     /**
      * Set JSON but first validate it's parseable into a DBObject
      */
-    public static void setJSON( Configuration conf, String key, String value ){
+    public static void setJSON(JobConf conf, String key, String value ){
         try {
             final Object dbObj = JSON.parse( value );
             setDBObject( conf, key, (DBObject) dbObj );
@@ -348,7 +347,7 @@ public class MongoConfigUtil {
         }
     }
 
-    public static DBObject getDBObject( Configuration conf, String key ){
+    public static DBObject getDBObject(JobConf conf, String key ){
         try {
             final String json = conf.get( key );
             final DBObject obj = (DBObject) JSON.parse( json );
@@ -363,15 +362,15 @@ public class MongoConfigUtil {
         }
     }
 
-    public static void setDBObject( Configuration conf, String key, DBObject value ){
+    public static void setDBObject(JobConf conf, String key, DBObject value ){
         conf.set( key, JSON.serialize( value ) );
     }
 
-    public static void setQuery( Configuration conf, String query ){
+    public static void setQuery(JobConf conf, String query ){
         setJSON( conf, INPUT_QUERY, query );
     }
 
-    public static void setQuery( Configuration conf, DBObject query ){
+    public static void setQuery(JobConf conf, DBObject query ){
         setDBObject( conf, INPUT_QUERY, query );
     }
 
@@ -379,15 +378,15 @@ public class MongoConfigUtil {
      * Returns the configured query as a DBObject... If you want a string call toString() on the returned object. or use
      * JSON.serialize()
      */
-    public static DBObject getQuery( Configuration conf ){
+    public static DBObject getQuery(JobConf conf ){
         return getDBObject( conf, INPUT_QUERY );
     }
 
-    public static void setFields( Configuration conf, String fields ){
+    public static void setFields(JobConf conf, String fields ){
         setJSON( conf, INPUT_FIELDS, fields );
     }
 
-    public static void setFields( Configuration conf, DBObject fields ){
+    public static void setFields(JobConf conf, DBObject fields ){
         setDBObject( conf, INPUT_FIELDS, fields );
     }
 
@@ -395,15 +394,15 @@ public class MongoConfigUtil {
      * Returns the configured fields as a DBObject... If you want a string call toString() on the returned object. or
      * use JSON.serialize()
      */
-    public static DBObject getFields( Configuration conf ){
+    public static DBObject getFields(JobConf conf ){
         return getDBObject( conf, INPUT_FIELDS );
     }
 
-    public static void setSort( Configuration conf, String sort ){
+    public static void setSort(JobConf conf, String sort ){
         setJSON( conf, INPUT_SORT, sort );
     }
 
-    public static void setSort( Configuration conf, DBObject sort ){
+    public static void setSort(JobConf conf, DBObject sort ){
         setDBObject( conf, INPUT_SORT, sort );
     }
 
@@ -411,31 +410,31 @@ public class MongoConfigUtil {
      * Returns the configured sort as a DBObject... If you want a string call toString() on the returned object. or use
      * JSON.serialize()
      */
-    public static DBObject getSort( Configuration conf ){
+    public static DBObject getSort(JobConf conf ){
         return getDBObject( conf, INPUT_SORT );
     }
 
-    public static int getLimit( Configuration conf ){
+    public static int getLimit(JobConf conf ){
         return conf.getInt( INPUT_LIMIT, 0 );
     }
 
-    public static void setLimit( Configuration conf, int limit ){
+    public static void setLimit(JobConf conf, int limit ){
         conf.setInt( INPUT_LIMIT, limit );
     }
 
-    public static int getSkip( Configuration conf ){
+    public static int getSkip(JobConf conf ){
         return conf.getInt( INPUT_SKIP, 0 );
     }
 
-    public static void setSkip( Configuration conf, int skip ){
+    public static void setSkip(JobConf conf, int skip ){
         conf.setInt( INPUT_SKIP, skip );
     }
 
-    public static int getSplitSize( Configuration conf ){
+    public static int getSplitSize(JobConf conf ){
         return conf.getInt( INPUT_SPLIT_SIZE, DEFAULT_SPLIT_SIZE );
     }
 
-    public static void setSplitSize( Configuration conf, int value ){
+    public static void setSplitSize(JobConf conf, int value ){
         conf.setInt( INPUT_SPLIT_SIZE, value );
     }
 
@@ -446,11 +445,11 @@ public class MongoConfigUtil {
      *  ( issue has to do with chunks moving / relocating during balancing phases)
      * @return
      */
-    public static boolean canReadSplitsFromShards( Configuration conf ){
+    public static boolean canReadSplitsFromShards(JobConf conf ){
         return conf.getBoolean( SPLITS_USE_SHARDS, false );
     }
 
-    public static void setReadSplitsFromShards( Configuration conf, boolean value ){
+    public static void setReadSplitsFromShards(JobConf conf, boolean value ){
         conf.setBoolean( SPLITS_USE_SHARDS, value );
     }
 
@@ -458,43 +457,43 @@ public class MongoConfigUtil {
      * If sharding is enabled,
      * Use the sharding configured chunks to split up data.
      */
-    public static boolean isShardChunkedSplittingEnabled( Configuration conf ) {
+    public static boolean isShardChunkedSplittingEnabled(JobConf conf ) {
         return conf.getBoolean( SPLITS_USE_CHUNKS, true );
     }
 
-    public static void setShardChunkSplittingEnabled( Configuration conf, boolean value) {
+    public static void setShardChunkSplittingEnabled(JobConf conf, boolean value) {
         conf.setBoolean( SPLITS_USE_CHUNKS, value );
     }
 
-    public static boolean canReadSplitsFromSecondary( Configuration conf ) {
+    public static boolean canReadSplitsFromSecondary(JobConf conf ) {
         return conf.getBoolean( SPLITS_SLAVE_OK, false );
     }
 
-    public static void setReadSplitsFromSecondary( Configuration conf, boolean value ) {
+    public static void setReadSplitsFromSecondary(JobConf conf, boolean value ) {
         conf.getBoolean( SPLITS_SLAVE_OK, value );
     }
 
-    public static boolean createInputSplits( Configuration conf ) {
+    public static boolean createInputSplits(JobConf conf ) {
         return conf.getBoolean( CREATE_INPUT_SPLITS, true );
     }
 
-    public static void setCreateInputSplits( Configuration conf, boolean value ) {
+    public static void setCreateInputSplits(JobConf conf, boolean value ) {
         conf.setBoolean( CREATE_INPUT_SPLITS, value );
     }
 
-    public static void setInputSplitKeyPattern( Configuration conf, String pattern ) {
+    public static void setInputSplitKeyPattern(JobConf conf, String pattern ) {
         setJSON( conf, INPUT_SPLIT_KEY_PATTERN, pattern );
     }
 
-    public static void setInputSplitKey( Configuration conf, DBObject key ) {
+    public static void setInputSplitKey(JobConf conf, DBObject key ) {
         setDBObject( conf, INPUT_SPLIT_KEY_PATTERN, key );
     }
-    
-    public static String getInputSplitKeyPattern( Configuration conf ) {
+
+    public static String getInputSplitKeyPattern(JobConf conf ) {
         return conf.get( INPUT_SPLIT_KEY_PATTERN, "{ \"_id\": 1 }" );
     }
-    
-    public static DBObject getInputSplitKey( Configuration conf ) {
+
+    public static DBObject getInputSplitKey(JobConf conf ) {
         try {
             final String json = getInputSplitKeyPattern( conf );
             final DBObject obj = (DBObject) JSON.parse( json );
@@ -509,20 +508,20 @@ public class MongoConfigUtil {
     }
 
 
-    public static void setInputKey( Configuration conf, String fieldName ) {
+    public static void setInputKey(JobConf conf, String fieldName ) {
         // TODO (bwm) - validate key rules?
         conf.set( INPUT_KEY, fieldName );
     }
-    
-    public static String getInputKey( Configuration conf ) {
+
+    public static String getInputKey(JobConf conf ) {
         return conf.get( INPUT_KEY, "_id" );
     }
-   
-    public static void setNoTimeout( Configuration conf, boolean value ) {
+
+    public static void setNoTimeout(JobConf conf, boolean value ) {
         conf.setBoolean( INPUT_NOTIMEOUT, value );
     }
-    
-    public static boolean isNoTimeout( Configuration conf ) {
+
+    public static boolean isNoTimeout(JobConf conf ) {
         return conf.getBoolean( INPUT_NOTIMEOUT, false );
     }
 }
